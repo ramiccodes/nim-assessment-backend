@@ -27,6 +27,7 @@ const create = async (req, res) => {
   }
 };
 
+
 const update = async (req, res) => {
   try {
     const menu = await MenuItems.update(req.params.id, req.body);
@@ -36,4 +37,23 @@ const update = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getOne, create, update };
+const remove = async (req, res) => {
+  try {
+    const menu = await MenuItems.remove(req.params.id);
+    res.send(menu);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+const search = async (req, res) => {
+  try {
+    const menu = await MenuItems.search(req.query.q);
+    res.send(menu);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+module.exports = { getAll, getOne, create, remove, search, update };
+

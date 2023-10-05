@@ -27,7 +27,6 @@ const create = async (req, res) => {
   }
 };
 
-
 const update = async (req, res) => {
   try {
     const menu = await MenuItems.update(req.params.id, req.body);
@@ -56,4 +55,3 @@ const search = async (req, res) => {
 };
 
 module.exports = { getAll, getOne, create, remove, search, update };
-

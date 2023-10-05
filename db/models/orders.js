@@ -1,4 +1,6 @@
+const { all } = require("../../routes/menuRouter.js");
 const mongoose = require("../db.js");
+const MenuItems = require("./menuItems.js");
 
 const orderSchema = new mongoose.Schema({
   name: {
@@ -64,6 +66,7 @@ const getOne = async (id) => {
 
 const create = async (body) => {
   const order = await Order.create(body);
+  console.log(body);
   return order;
 };
 
@@ -82,6 +85,39 @@ const getByStatus = async (status) => {
   return orders;
 };
 
+const getTotalSales = async () => {
+  const calculateTotalPrice = () => {
+    let totalSales = 0;
+    Order.find({
+      $or: [{ status: "delivered" }, { status: "pending" }]
+    }).then((orders) => {
+      for (let i = 0; i < orders.length; i += 1) {
+        for (let j = 0; j < orders[i].items.length; j += 1) {
+          // const calculateTotalPrice = async () => {
+          MenuItems.getOne(orders[i].items[j].item.toString()).then((item) => {
+            const itemTotalPrice = item.price * orders[i].items[j].quantity;
+            totalSales += itemTotalPrice;
+            console.log(totalSales);
+          });
+        }
+      }
+    });
+    return { total: totalSales };
+  };
+  await calculateTotalPrice();
+};
+
+const getByOrderStatus = async (query) => {
+  try {
+    const orders = await Order.find({
+      $or: [{ status: { $regex: query } }]
+    });
+    return orders;
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports = {
   getAll,
   getOne,
@@ -89,5 +125,7 @@ module.exports = {
   update,
   remove,
   getByStatus,
+  getTotalSales,
+  getByOrderStatus,
   Order
 };
